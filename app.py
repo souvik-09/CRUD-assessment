@@ -10,7 +10,7 @@ load_dotenv(path.join(getcwd(), '.env'))
 
 
 def create_app():
-    global db
+    
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = environ.get('DB_URI') 
     app.config["SQLALCHEMY_ECHO"] = False
@@ -36,33 +36,34 @@ def create_app():
                 db.session.commit()
 
                 # Extract cast data from request
-                cast_name = request.form['cast_name']
-                cast_gender = request.form['cast_gender']
-                cast_character = request.form['cast_character']
+                cast_names = request.form.getlist('cast_name[]')
+                cast_genders = request.form.getlist('cast_gender[]')
+                cast_characters = request.form.getlist('cast_character[]')
 
-                # Use newly created movie id to create cast record
-                cast = Cast(cast_name=cast_name, cast_gender=cast_gender, cast_character=cast_character, movie_id=movie.id)
-                db.session.add(cast)
-                db.session.commit()
-                
-                # Extract dialogue data from request
-                dialogue = request.form['dialogue']
-                start_time = request.form['start_time']
-                end_time = request.form['end_time']
-                
-                # Use newly created cast id to create dialogue record
-                dialogue = Dialogue(dialogue=dialogue, start_time=start_time, end_time=end_time, cast_id=cast.id)
-                db.session.add(dialogue)
-                db.session.commit()
+                # Use newly created movie id to create cast records
+                for i in range(len(cast_names)):
+                    cast = Cast(cast_name=cast_names[i], cast_gender=cast_genders[i], cast_character=cast_characters[i], movie_id=movie.id)
+                    db.session.add(cast)
+                    db.session.commit()
+
+                    # Extract dialogue data from request for this cast
+                    dialogue = request.form.getlist(f'dialogue[]')
+                    start_time = request.form.getlist(f'start_time[]')
+                    end_time = request.form.getlist(f'end_time[]')
+
+                    # Use newly created cast id to create dialogue records
+                    for j in range(len(dialogue)):
+                        d = Dialogue(dialogue=dialogue[j], start_time=start_time[j], end_time=end_time[j], cast_id=cast.id)
+                        db.session.add(d)
+                        db.session.commit()
 
             all_movies = Movie.query.all()
             all_casts = Cast.query.all()
             all_dialogues = Dialogue.query.all()
-            return render_template("home.html", all_movies = all_movies,all_casts = all_casts, all_dialogues = all_dialogues)
+            return render_template("home.html", all_movies=all_movies, all_casts=all_casts, all_dialogues=all_dialogues)
+
 
                                    
-                
-
 
         @app.route('/update_movie/<int:movie_id>', methods=['GET', 'POST'])
         def update_movie(movie_id):

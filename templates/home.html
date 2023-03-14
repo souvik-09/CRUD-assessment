@@ -2,47 +2,124 @@
 {% block title %} Movies {% endblock title %}
 {% block body %}
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <div class="container my-3">
-        <form action = "/" method = "POST">
-            <div class="mb-3">
-              <h1> Create Movie </h1>
-                <label for="movie_name" class="form-label">Movie Name</label>
-                <input type="text" class="form-control" name = "movie_name" id="movie_name" aria-describedby="emailHelp">
+<div class="container my-3">
+    <form action="/" method="POST">
+        <div class="row">
+            <div class="col">
+                <div class="mb-3">
+                    <h1> Create Movie </h1>
+                    <label for="movie_name" class="form-label">Movie Name</label>
+                    <input type="text" class="form-control" name="movie_name" id="movie_name" style="width: 100%;" aria-describedby="emailHelp" required>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="movie_duration" class="form-label">Movie Duration (in Mins)</label>
-                <input type="text" class="form-control" name = "movie_duration" id="movie_duration">
+            <div class="col" style="margin-top: 3.5em;">
+                <div class="mb-3">
+                    <label for="movie_duration" class="form-label">Movie Duration (in Mins)</label>
+                    <input type="number" class="form-control" name="movie_duration" id="movie_duration" min="1" style="width: 100%;" required>
+                </div>
             </div>
-            <div class="mb-3">
-              <h3> Cast Details </h3>
-                <label for="cast_name" class="form-label">Cast Name</label>
-                <input type="text" class="form-control" name = "cast_name" id="cast_name" aria-describedby="emailHelp">
-            </div>
-            <div class="mb-3">   
-                <label for="cast_character" class="form-label">Cast Gender</label>
-                <input type="text" class="form-control" name = "cast_gender" id="cast_gender" aria-describedby="emailHelp">
-            </div>
-            <div class="mb-3">
-                <label for="cast_character" class="form-label">Cast Character</label>
-                <input type="text" class="form-control" name = "cast_character" id="cast_character" aria-describedby="emailHelp">
-            </div>
-            <h3> Dialogue List </h3>
-            <div class="form-group">
-              <label for="dialogue">Dialogue</label>
-              <textarea class="form-control" name = "dialogue" id="dialogue" rows="3"></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="start_time" class="form-label">Start time</label>
-              <input type="text" class="form-control" name = "start_time" id="start_time" aria-describedby="emailHelp">
-          </div>
-          <div class="mb-3">
-            <label for="end_time" class="form-label">End time</label>
-            <input type="text" class="form-control" name = "end_time" id="end_time" aria-describedby="emailHelp">
         </div>
-            <button type="submit" class="btn btn-primary">Create Movie</button>
-        </form>
-    </div>
+        
+        <div id="cast-list">
+            <div class="row cast-row">
+              <div class="col">
+                <div class="mb-3">
+                  <h3>Cast Details</h3><br>
+                  <label for="cast_name" class="form-label">Cast Name</label>
+                  <input type="text" class="form-control" name="cast_name[]" style="width: 100%;" aria-describedby="emailHelp" required>
+                </div>
+              </div>
+              <div class="col" style="margin-top: 4em;">
+                <div class="mb-3">
+                  <label for="cast_gender" class="form-label">Cast Gender</label>
+                  <select class="form-select" name="cast_gender[]" style="width: 100%;" required>
+                    <option value="" selected>-- Select Gender --</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col" style="margin-top: 4em;"> 
+                <div class="mb-3">
+                  <label for="cast_character" class="form-label">Cast Character</label>
+                  <input type="text" class="form-control" name="cast_character[]" style="width: 100%;" aria-describedby="emailHelp" required><br>
+                  <button type="button" class="btn btn-outline-warning remove-cast-btn">Remove Cast</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="add-cast-row" >
+            <button type="button" class="btn btn-outline-info" id="add-cast-btn">Add More Cast</button>
+          </div>
+          <br>
+          
+          <script>
+            $(document).ready(function() {
+              // Add more cast rows
+              $("#add-cast-btn").click(function() {
+                var castRow = $(".cast-row:first").clone();
+                castRow.find("input").val("");
+                castRow.find("select").prop("selectedIndex", 0);
+                castRow.appendTo("#cast-list");
+              });
+            
+              // Remove cast row
+              $(document).on("click", ".remove-cast-btn", function() {
+                $(this).closest(".cast-row").remove();
+              });
+            });
+          </script>
+          
+          
+                 
+          <h3>Dialogue List</h3>
+          <div id="dialogue-list">
+              <div class="form-group">
+                  <div class="row">
+                      <div class="col">
+                          <div class="mb-3">
+                              <label for="dialogue">Dialogue</label>
+                              <textarea class="form-control" name="dialogue[]" rows="3" required></textarea>
+                          </div>
+                      </div>
+                      <div class="col" style="margin-top: 3.5em;">
+                          <div class="mb-3">
+                              <label for="start_time">Start Time:</label>
+                              <input type="time" name="start_time[]" step="1" required>
+                          </div>
+                      </div>
+                      <div class="col" style="margin-top: 3.5em;">
+                          <div class="mb-3">
+                              <label for="end_time">End Time:</label>
+                              <input type="time" name="end_time[]" step="1" required><br><br>
+                              <button type="button" class="btn btn-outline-warning remove-cast-btn">Remove Dialogue</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <button type="button" class="btn btn-outline-info" id="add-dialogue-btn">Add More Dialogue</button>
+          
+          <script>
+              $(document).ready(function() {
+                  $("#add-dialogue-btn").click(function() {
+                      var html = '<div class="form-group"><div class="row"><div class="col"><div class="mb-3"><label for="dialogue">Dialogue</label><textarea class="form-control" name="dialogue[]" rows="3" required></textarea></div></div><div class="col" style="margin-top: 3.5em;"><div class="mb-3"><label for="start_time">Start Time:</label><input type="time" name="start_time[]" step="1" required></div></div><div class="col" style="margin-top: 3.5em;"><div class="mb-3"><label for="end_time">End Time:</label><input type="time" name="end_time[]" step="1" required><br><br><button type="button" class="btn btn-outline-warning remove-cast-btn">Remove Dialogue</button></div></div></div></div>';
+                      $("#dialogue-list").append(html);
+                  });
+          
+                  $(document).on("click", ".remove-cast-btn", function() {
+                      $(this).closest(".form-group").remove();
+                  });
+              });
+          </script>
+          
+        <br><br>
+        <button type="submit" class="btn btn-primary">Create Movie</button>
+    </form>
+</div>
     <div class="container mb-3">
       <h3>Your Movies</h3>
       {% if all_movies|length == 0 and all_casts|length == 0 and all_dialogues|length == 0 %}
@@ -122,6 +199,35 @@
               {% endif %}
 
     </div>
+    <script>
+        // Add an event listener to the form submit button
+        document.querySelector("form").addEventListener("submit", function(event) {
+            // Get the start and end time inputs
+            var startTimeInput = document.querySelector("input[name='start_time[]']");
+            var endTimeInput = document.querySelector("input[name='end_time[]']");
+    
+            // Get the values of the start and end time inputs
+            var startTimeValue = startTimeInput.value;
+            var endTimeValue = endTimeInput.value;
+    
+            // Split the start and end time values into hours and minutes
+            var startTimeParts = startTimeValue.split(":");
+            var endTimeParts = endTimeValue.split(":");
+    
+            // Convert the start and end time values to minutes
+            var startTimeMinutes = parseInt(startTimeParts[0], 10) * 60 + parseInt(startTimeParts[1], 10);
+            var endTimeMinutes = parseInt(endTimeParts[0], 10) * 60 + parseInt(endTimeParts[1], 10);
+    
+            // Compare the start and end times
+            if (endTimeMinutes <= startTimeMinutes) {
+                // Prevent the form from submitting
+                event.preventDefault();
+    
+                // Show an error message
+                alert("The end time must be greater than the start time.");
+            }
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
         crossorigin="anonymous"></script>
